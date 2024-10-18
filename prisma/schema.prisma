@@ -24,7 +24,10 @@ model User {
 }
 
 model Univeristy {
-  id   Int    @id @default(autoincrement())
-  name String
-  User User[]
+  id               Int     @id @default(autoincrement())
+  name             String
+  description      String
+  numberOfProjects Int
+  photo            String?
+  users            User[]
 }
