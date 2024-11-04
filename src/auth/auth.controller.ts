@@ -40,8 +40,10 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('change-email')
-  @UsePipes(new ZodValidationPipe(changeEmailSchema))
-  changeEmail(@Body() formData: ChangeEmailDto, @User() user: UserFromReq) {
+  changeEmail(
+    @Body(new ZodValidationPipe(changeEmailSchema)) formData: ChangeEmailDto,
+    @User() user: UserFromReq,
+  ) {
     return this.authService.changeEmail(user.sub, formData);
   }
 }
