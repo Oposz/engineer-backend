@@ -14,16 +14,15 @@ datasource db {
 }
 
 model User {
-  id           Int        @id @default(autoincrement())
-  email        String     @unique
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
   name         String
   lastName     String
   password     String
-  university   Univeristy @relation(fields: [universityId], references: [id])
-  universityId Int
+  universities University[]
 }
 
-model Univeristy {
+model University {
   id               Int     @id @default(autoincrement())
   name             String
   description      String

@@ -3,7 +3,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { UsersService } from './users.service';
 import { User } from '../decorators/user.decorator';
 
-interface UserFromReq {
+export interface UserFromReq {
   sub: number;
   username: string;
   userLastName: string;

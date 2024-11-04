@@ -1,14 +1,17 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDto } from './dto/registerDto';
-import { User } from '@prisma/client';
+import { RegisterDto } from './schemas/registerDto';
+import { CreateJwtPayload } from '../utils/createJwtPayload';
+import { ChangeEmailDto } from '../users/schemas/changeEmailSchema';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private prisma: PrismaService,
   ) {}
 
   async signIn(email: string, _password: string) {
@@ -18,7 +21,7 @@ export class AuthService {
     }
 
     return {
-      access_token: await this.jwtService.signAsync(this.createPayload(user)),
+      access_token: await this.jwtService.signAsync(CreateJwtPayload(user)),
     };
   }
 
@@ -27,17 +30,38 @@ export class AuthService {
 
     return {
       access_token: await this.jwtService.signAsync(
-        this.createPayload(createdUser),
+        CreateJwtPayload(createdUser),
       ),
     };
   }
 
-  private createPayload(user: User) {
+  async changeEmail(userId: number, formData: ChangeEmailDto) {
+    const password = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        password: true,
+      },
+    });
+
+    if (password?.password !== formData.password) {
+      throw new UnauthorizedException();
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        email: formData.newEmail,
+      },
+    });
+
     return {
-      sub: user.id,
-      username: user.name,
-      userLastName: user.lastName,
-      email: user.email,
+      access_token: await this.jwtService.signAsync(
+        CreateJwtPayload(updatedUser),
+      ),
     };
   }
 }

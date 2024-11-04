@@ -6,6 +6,6 @@ export class UniversitiesService {
   constructor(private prisma: PrismaService) {}
 
   getUniversities() {
-    return this.prisma.univeristy.findMany();
+    return this.prisma.university.findMany();
   }
 }
