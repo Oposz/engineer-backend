@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from '../auth/schemas/registerDto';
 
@@ -35,6 +35,26 @@ export class UsersService {
           connect: { id: userData.university },
         },
         lastName: userData.lastName,
+      },
+    });
+  }
+
+  async connectUniversity(universityId: number, userId: number) {
+    const universityToConnect = await this.prisma.university.findUnique({
+      where: { id: universityId },
+    });
+
+    if (!universityToConnect) {
+      throw new NotFoundException();
+    }
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        universities: {
+          connect: universityToConnect,
+        },
       },
     });
   }
