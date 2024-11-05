@@ -12,12 +12,13 @@ import { SignInDto, signInSchema } from './schemas/signInDto';
 import { RegisterDto, registerSchema } from './schemas/registerDto';
 import { ZodValidationPipe } from '../validation/zod-validation.pipe';
 import { AuthGuard } from './auth.guard';
-import {
-  ChangeEmailDto,
-  changeEmailSchema,
-} from '../users/schemas/changeEmailSchema';
+import { ChangeEmailDto, changeEmailSchema } from './schemas/changeEmailSchema';
 import { User } from '../decorators/user.decorator';
 import { UserFromReq } from '../users/users.controller';
+import {
+  ChangePasswordDto,
+  changePasswordSchema,
+} from './schemas/changePasswordSchema';
 
 @Controller('auth')
 export class AuthController {
@@ -45,5 +46,16 @@ export class AuthController {
     @User() user: UserFromReq,
   ) {
     return this.authService.changeEmail(user.sub, formData);
+  }
+
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('change-password')
+  changePassword(
+    @Body(new ZodValidationPipe(changePasswordSchema))
+    formData: ChangePasswordDto,
+    @User() user: UserFromReq,
+  ) {
+    return this.authService.changePassword(user.sub, formData);
   }
 }

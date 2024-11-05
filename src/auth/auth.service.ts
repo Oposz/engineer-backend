@@ -3,8 +3,9 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './schemas/registerDto';
 import { CreateJwtPayload } from '../utils/createJwtPayload';
-import { ChangeEmailDto } from '../users/schemas/changeEmailSchema';
+import { ChangeEmailDto } from './schemas/changeEmailSchema';
 import { PrismaService } from '../prisma/prisma.service';
+import { ChangePasswordDto } from './schemas/changePasswordSchema';
 
 @Injectable()
 export class AuthService {
@@ -36,14 +37,7 @@ export class AuthService {
   }
 
   async changeEmail(userId: number, formData: ChangeEmailDto) {
-    const password = await this.prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        password: true,
-      },
-    });
+    const password = await this.getUserPassword(userId);
 
     if (password?.password !== formData.password) {
       throw new UnauthorizedException();
@@ -63,5 +57,39 @@ export class AuthService {
         CreateJwtPayload(updatedUser),
       ),
     };
+  }
+
+  async changePassword(userId: number, formData: ChangePasswordDto) {
+    const password = await this.getUserPassword(userId);
+
+    if (password?.password !== formData.password) {
+      throw new UnauthorizedException();
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: formData.newPassword,
+      },
+    });
+
+    return {
+      access_token: await this.jwtService.signAsync(
+        CreateJwtPayload(updatedUser),
+      ),
+    };
+  }
+
+  private async getUserPassword(userId: number) {
+    return this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        password: true,
+      },
+    });
   }
 }
