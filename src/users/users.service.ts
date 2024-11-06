@@ -12,7 +12,7 @@ export class UsersService {
     });
   }
 
-  async getCurrentUser(id: number) {
+  async getCurrentUser(id: string) {
     const { password, ...user } =
       (await this.prisma.user.findUnique({
         include: {
@@ -39,7 +39,7 @@ export class UsersService {
     });
   }
 
-  async connectUniversity(universityId: number, userId: number) {
+  async connectUniversity(universityId: string, userId: string) {
     const universityToConnect = await this.prisma.university.findUnique({
       where: { id: universityId },
     });

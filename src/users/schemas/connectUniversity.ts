@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const connectUniversitySchema = z
   .object({
-    universityId: z.number(),
+    universityId: z.string().min(1),
   })
   .required();
 

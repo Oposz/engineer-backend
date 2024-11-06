@@ -36,7 +36,7 @@ export class AuthService {
     };
   }
 
-  async changeEmail(userId: number, formData: ChangeEmailDto) {
+  async changeEmail(userId: string, formData: ChangeEmailDto) {
     const password = await this.getUserPassword(userId);
 
     if (password?.password !== formData.password) {
@@ -59,7 +59,7 @@ export class AuthService {
     };
   }
 
-  async changePassword(userId: number, formData: ChangePasswordDto) {
+  async changePassword(userId: string, formData: ChangePasswordDto) {
     const password = await this.getUserPassword(userId);
 
     if (password?.password !== formData.password) {
@@ -82,7 +82,7 @@ export class AuthService {
     };
   }
 
-  private async getUserPassword(userId: number) {
+  private async getUserPassword(userId: string) {
     return this.prisma.user.findUnique({
       where: {
         id: userId,

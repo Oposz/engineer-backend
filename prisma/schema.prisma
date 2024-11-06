@@ -14,19 +14,34 @@ datasource db {
 }
 
 model User {
-  id           Int          @id @default(autoincrement())
+  id           String       @id @default(cuid())
   email        String       @unique
   name         String
   lastName     String
   password     String
   universities University[]
+  projects     Project?     @relation(fields: [projectId], references: [id])
+  projectId    String?
 }
 
 model University {
-  id               Int     @id @default(autoincrement())
-  name             String
-  description      String
-  numberOfProjects Int
-  photo            String?
-  users            User[]
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  photo       String?
+  users       User[]
+  projects    Project[]
+}
+
+model Project {
+  id                String     @id @unique @default(cuid())
+  name              String
+  description       String?
+  photo             String?
+  favourite         Boolean
+  availableSlots    Int
+  signedUsers       User[]
+  dueTo             DateTime?
+  leadingUniversity University @relation(fields: [universityId], references: [id])
+  universityId      String
 }

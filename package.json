@@ -26,6 +26,7 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.19.1",
+    "lodash": "^4.17.21",
     "prisma": "^5.19.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",

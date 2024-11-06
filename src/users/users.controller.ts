@@ -18,7 +18,7 @@ import {
 import { ZodValidationPipe } from '../validation/zod-validation.pipe';
 
 export interface UserFromReq {
-  sub: number;
+  sub: string;
   username: string;
   userLastName: string;
   email: string;
