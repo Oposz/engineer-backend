@@ -20,8 +20,8 @@ model User {
   lastName     String
   password     String
   universities University[]
-  projects     Project?     @relation(fields: [projectId], references: [id])
-  projectId    String?
+  projects     Project[]
+  position     Position[]
 }
 
 model University {
@@ -31,6 +31,7 @@ model University {
   photo       String?
   users       User[]
   projects    Project[]
+  leaders     Leader[]
 }
 
 model Project {
@@ -42,6 +43,29 @@ model Project {
   availableSlots    Int
   signedUsers       User[]
   dueTo             DateTime?
+  postions          Position[]
   leadingUniversity University @relation(fields: [universityId], references: [id])
   universityId      String
+  leader            Leader     @relation(fields: [leaderId], references: [id])
+  leaderId          String
+}
+
+model Leader {
+  id           String     @id @unique @default(cuid())
+  name         String
+  lastName     String
+  email        String     @unique
+  photo        String?
+  university   University @relation(fields: [universityId], references: [id])
+  universityId String
+  projects     Project[]
+}
+
+model Position {
+  id        String  @id @unique @default(cuid())
+  name      String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
 }

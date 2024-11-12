@@ -25,14 +25,20 @@ export interface UserFromReq {
   iat: number;
 }
 
-@Controller('users')
+@Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(AuthGuard)
-  @Get('me')
+  @Get()
   getProfile(@User() user: UserFromReq) {
     return this.usersService.getCurrentUser(user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('teams')
+  getTeams(@User() user: UserFromReq) {
+    return this.usersService.getUserTeams(user.sub);
   }
 
   @HttpCode(HttpStatus.OK)

@@ -6,7 +6,7 @@ import { RegisterDto } from '../auth/schemas/registerDto';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findOneByCredentials(email: string, password: string) {
+  findOneByCredentials(email: string, password: string) {
     return this.prisma.user.findFirst({
       where: { email, password },
     });
@@ -56,6 +56,55 @@ export class UsersService {
           connect: universityToConnect,
         },
       },
+    });
+  }
+
+  async getUserTeams(userId: string) {
+    const teams = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        projects: {
+          include: {
+            leadingUniversity: {
+              select: {
+                name: true,
+              },
+            },
+            leader: {
+              select: {
+                name: true,
+                lastName: true,
+              },
+            },
+            signedUsers: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+        position: true,
+      },
+    });
+
+    if (!teams) {
+      return [];
+    }
+
+    const positions = teams.position;
+
+    return teams.projects.map((project) => {
+      const userPosition = positions.find(
+        (position) => position.projectId === project.id,
+      );
+
+      return {
+        ...project,
+        leadingUniversityName: project.leadingUniversity.name,
+        role: userPosition?.name ?? '',
+      };
     });
   }
 }
