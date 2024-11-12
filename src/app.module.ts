@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UniversitiesModule } from './universities/universities.module';
 import { ProjectsModule } from './projects/projects.module';
+import { LeadersModule } from './leaders/leaders.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ProjectsModule } from './projects/projects.module';
     UniversitiesModule,
     PrismaModule,
     ProjectsModule,
+    LeadersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

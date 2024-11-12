@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class UniversitiesService {
+export class LeadersService {
   constructor(private prisma: PrismaService) {}
 
-  getUniversities() {
-    return this.prisma.university.findMany({
+  getAllLeaders() {
+    return this.prisma.leader.findMany({
       include: {
-        projects: true,
+        university: true,
       },
     });
   }
