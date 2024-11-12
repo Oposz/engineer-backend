@@ -12,4 +12,23 @@ export class UniversitiesService {
       },
     });
   }
+
+  getUniversity(universityId: string) {
+    return this.prisma.university.findFirst({
+      where: {
+        id: universityId,
+      },
+      include: {
+        projects: {
+          include: {
+            signedUsers: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }
