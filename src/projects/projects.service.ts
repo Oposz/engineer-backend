@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -55,6 +55,27 @@ export class ProjectsService {
           },
         },
         sponsors: true,
+      },
+    });
+  }
+
+  async toggleIsProjectFavourite(projectId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundException();
+    }
+
+    return this.prisma.project.update({
+      where: {
+        id: projectId,
+      },
+      data: {
+        favourite: !project.favourite,
       },
     });
   }

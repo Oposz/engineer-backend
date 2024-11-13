@@ -1,4 +1,13 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Put,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { ProjectsService } from './projects.service';
 import { User } from '../decorators/user.decorator';
@@ -16,7 +25,13 @@ export class ProjectsController {
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  getProject(@Param() param: { id: string }) {
-    return this.projectsService.getProject(param.id);
+  getProject(@Param() param: { projectId: string }) {
+    return this.projectsService.getProject(param.projectId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('favourite/:id')
+  toggleIsProjectFavourite(@Param('id') param: string) {
+    return this.projectsService.toggleIsProjectFavourite(param);
   }
 }
