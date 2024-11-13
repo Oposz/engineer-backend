@@ -35,7 +35,7 @@ model University {
 }
 
 model Project {
-  id                String     @id @unique @default(cuid())
+  id                String             @id @unique @default(cuid())
   name              String
   description       String?
   photo             String?
@@ -43,11 +43,13 @@ model Project {
   availableSlots    Int
   signedUsers       User[]
   dueTo             DateTime?
-  postions          Position[]
-  leadingUniversity University @relation(fields: [universityId], references: [id])
+  takenPositions    Position[]
+  definedPositions  DefinedPositions[]
+  leadingUniversity University         @relation(fields: [universityId], references: [id])
   universityId      String
-  leader            Leader     @relation(fields: [leaderId], references: [id])
+  leader            Leader             @relation(fields: [leaderId], references: [id])
   leaderId          String
+  sponsors          Sponsor[]
 }
 
 model Leader {
@@ -66,10 +68,28 @@ model Leader {
 }
 
 model Position {
-  id        String  @id @unique @default(cuid())
-  name      String
-  user      User    @relation(fields: [userId], references: [id])
-  userId    String
-  project   Project @relation(fields: [projectId], references: [id])
-  projectId String
+  id                String           @id @unique @default(cuid())
+  user              User             @relation(fields: [userId], references: [id])
+  userId            String
+  project           Project          @relation(fields: [projectId], references: [id])
+  projectId         String
+  definedPosition   DefinedPositions @relation(fields: [definedPositionId], references: [id])
+  definedPositionId String
+}
+
+model DefinedPositions {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  project     Project    @relation(fields: [projectId], references: [id])
+  projectId   String
+  positions   Position[]
+}
+
+model Sponsor {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  photo       String
+  projects    Project[]
 }

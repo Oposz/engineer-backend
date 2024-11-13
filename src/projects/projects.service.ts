@@ -5,9 +5,18 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ProjectsService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllProjects() {
+  async getAllProjects(userId: string) {
     const _ = require('lodash');
     const projects = await this.prisma.project.findMany({
+      where: {
+        NOT: {
+          signedUsers: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+      },
       include: {
         signedUsers: true,
       },
@@ -20,6 +29,33 @@ export class ProjectsService {
           _.omit(user, ['password']),
         ),
       };
+    });
+  }
+
+  getProject(projectId: string) {
+    return this.prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+      include: {
+        signedUsers: {
+          select: {
+            id: true,
+            lastName: true,
+            name: true,
+          },
+        },
+        definedPositions: true,
+        takenPositions: true,
+        leader: {
+          select: {
+            name: true,
+            lastName: true,
+            title: true,
+          },
+        },
+        sponsors: true,
+      },
     });
   }
 }

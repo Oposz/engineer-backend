@@ -16,7 +16,11 @@ export class UsersService {
     const { password, ...user } =
       (await this.prisma.user.findUnique({
         include: {
-          universities: true,
+          universities: {
+            include: {
+              projects: true,
+            },
+          },
         },
         where: {
           id: id,
