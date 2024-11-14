@@ -28,7 +28,7 @@ model University {
   id          String    @id @default(cuid())
   name        String
   description String
-  photo       String?
+  photo       String?   @db.Text
   users       User[]
   projects    Project[]
   leaders     Leader[]
@@ -38,7 +38,7 @@ model Project {
   id                String             @id @unique @default(cuid())
   name              String
   description       String?
-  photo             String?
+  photo             String?            @db.Text
   favourite         Boolean
   availableSlots    Int
   signedUsers       User[]
@@ -61,7 +61,7 @@ model Leader {
   email        String     @unique
   role         String
   department   String
-  photo        String?
+  photo        String?    @db.Text
   university   University @relation(fields: [universityId], references: [id])
   universityId String
   projects     Project[]
@@ -90,6 +90,6 @@ model Sponsor {
   id          String    @id @default(cuid())
   name        String
   description String?
-  photo       String
+  photo       String    @db.Text
   projects    Project[]
 }

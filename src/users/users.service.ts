@@ -89,7 +89,15 @@ export class UsersService {
             },
           },
         },
-        position: true,
+        position: {
+          include: {
+            definedPosition: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -107,7 +115,7 @@ export class UsersService {
       return {
         ...project,
         leadingUniversityName: project.leadingUniversity.name,
-        role: userPosition?.name ?? '',
+        role: userPosition?.definedPosition.name,
       };
     });
   }

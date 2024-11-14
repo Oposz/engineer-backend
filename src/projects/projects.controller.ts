@@ -25,8 +25,8 @@ export class ProjectsController {
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  getProject(@Param() param: { projectId: string }) {
-    return this.projectsService.getProject(param.projectId);
+  getProject(@Param('id') param: string) {
+    return this.projectsService.getProject(param);
   }
 
   @UseGuards(AuthGuard)
