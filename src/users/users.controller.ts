@@ -36,6 +36,12 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('universities')
+  getUniversities(@User() user: UserFromReq) {
+    return this.usersService.getUserUniversities(user.sub);
+  }
+
+  @UseGuards(AuthGuard)
   @Get('teams')
   getTeams(@User() user: UserFromReq) {
     return this.usersService.getUserTeams(user.sub);

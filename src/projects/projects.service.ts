@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AddNewProjectDto } from './schemas/addProjectSchema';
 
 @Injectable()
 export class ProjectsService {
@@ -78,5 +79,12 @@ export class ProjectsService {
         favourite: !project.favourite,
       },
     });
+  }
+
+  addNewProject(body: AddNewProjectDto) {
+    // TODO implement add new project functionality
+    // return this.prisma.project.create({
+    //   data: {body},
+    // });
   }
 }

@@ -43,6 +43,21 @@ export class UsersService {
     });
   }
 
+  getUserUniversities(userId: string) {
+    return this.prisma.university.findMany({
+      where: {
+        users: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+      include: {
+        leaders: true,
+      },
+    });
+  }
+
   async connectUniversity(universityId: string, userId: string) {
     const universityToConnect = await this.prisma.university.findUnique({
       where: { id: universityId },
