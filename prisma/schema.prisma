@@ -28,28 +28,30 @@ model University {
   id          String    @id @default(cuid())
   name        String
   description String
-  photo       String?   @db.Text
+  photo       Upload?   @relation(fields: [uploadId], references: [id])
   users       User[]
   projects    Project[]
   leaders     Leader[]
+  uploadId    String?
 }
 
 model Project {
-  id                String             @id @unique @default(cuid())
-  name              String
-  description       String?
-  photo             String?            @db.Text
-  favourite         Boolean
-  availableSlots    Int
-  signedUsers       User[]
-  dueTo             DateTime?
-  takenPositions    Position[]
-  definedPositions  DefinedPositions[]
-  leadingUniversity University         @relation(fields: [universityId], references: [id])
-  universityId      String
-  leader            Leader             @relation(fields: [leaderId], references: [id])
-  leaderId          String
-  sponsors          Sponsor[]
+  id                  String             @id @unique @default(cuid())
+  name                String
+  description         String?
+  photo               Upload?            @relation(fields: [uploadId], references: [id])
+  favourite           Boolean
+  availableSlots      Int
+  signedUsers         User[]
+  dueTo               DateTime?
+  takenPositions      Position[]
+  definedPositions    DefinedPositions[]
+  leadingUniversity   University         @relation(fields: [leadingUniversityId], references: [id])
+  leadingUniversityId String
+  leader              Leader             @relation(fields: [leaderId], references: [id])
+  leaderId            String
+  sponsors            Sponsor[]
+  uploadId            String?
 }
 
 model Leader {
@@ -61,10 +63,11 @@ model Leader {
   email        String     @unique
   role         String
   department   String
-  photo        String?    @db.Text
+  photo        Upload?    @relation(fields: [uploadId], references: [id])
   university   University @relation(fields: [universityId], references: [id])
   universityId String
   projects     Project[]
+  uploadId     String?
 }
 
 model Position {
@@ -90,6 +93,16 @@ model Sponsor {
   id          String    @id @default(cuid())
   name        String
   description String?
-  photo       String    @db.Text
+  photo       Upload    @relation(fields: [uploadId], references: [id])
   projects    Project[]
+  uploadId    String
+}
+
+model Upload {
+  id         String       @id @default(cuid())
+  data       String
+  University University[]
+  Project    Project[]
+  Leader     Leader[]
+  Sponsor    Sponsor[]
 }

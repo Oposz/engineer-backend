@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UniversitiesModule } from './universities/universities.module';
 import { ProjectsModule } from './projects/projects.module';
 import { LeadersModule } from './leaders/leaders.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { LeadersModule } from './leaders/leaders.module';
     PrismaModule,
     ProjectsModule,
     LeadersModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
