@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddNewProjectDto } from './schemas/addProjectSchema';
+import { ApplyToProjectDto } from './schemas/applyToProjectSchema';
 
 @Injectable()
 export class ProjectsService {
@@ -72,7 +73,7 @@ export class ProjectsService {
     });
 
     if (!project) {
-      throw new NotFoundException();
+      throw new NotFoundException('Project not found');
     }
 
     return this.prisma.project.update({
@@ -111,7 +112,10 @@ export class ProjectsService {
         ),
         definedPositions: {
           createMany: {
-            data: body.positions.map((position) => ({ name: position.name })),
+            data: body.positions.map((position) => ({
+              name: position.name,
+              quantity: position.quantity,
+            })),
           },
         },
         dueTo: new Date(body.dueTo),
@@ -128,6 +132,56 @@ export class ProjectsService {
             })),
           },
         },
+      },
+    });
+  }
+
+  async connectUserToProject(body: ApplyToProjectDto, userId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: {
+        id: body.projectId,
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+
+    return this.prisma.project.update({
+      where: {
+        id: body.projectId,
+      },
+      data: {
+        signedUsers: {
+          connect: {
+            id: userId,
+          },
+        },
+        takenPositions: {
+          create: {
+            userId: userId,
+            definedPositionId: body.id,
+          },
+        },
+      },
+      include: {
+        signedUsers: {
+          select: {
+            id: true,
+            lastName: true,
+            name: true,
+          },
+        },
+        definedPositions: true,
+        takenPositions: true,
+        leader: {
+          select: {
+            name: true,
+            lastName: true,
+            title: true,
+          },
+        },
+        sponsors: true,
       },
     });
   }

@@ -17,6 +17,10 @@ import {
   AddNewProjectDto,
   addNewProjectSchema,
 } from './schemas/addProjectSchema';
+import {
+  ApplyToProjectDto,
+  applyToProjectSchema,
+} from './schemas/applyToProjectSchema';
 
 @Controller('projects')
 export class ProjectsController {
@@ -45,5 +49,14 @@ export class ProjectsController {
   @UsePipes(new ZodValidationPipe(addNewProjectSchema))
   addNewProject(@Body() body: AddNewProjectDto) {
     return this.projectsService.addNewProject(body);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('/apply')
+  connectUserToProject(
+    @Body(new ZodValidationPipe(applyToProjectSchema)) body: ApplyToProjectDto,
+    @User() user: UserFromReq,
+  ) {
+    return this.projectsService.connectUserToProject(body, user.sub);
   }
 }
