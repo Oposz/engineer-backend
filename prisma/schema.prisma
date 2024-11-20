@@ -39,7 +39,8 @@ model Project {
   id                  String             @id @unique @default(cuid())
   name                String
   description         String?
-  photo               Upload?            @relation(fields: [uploadId], references: [id])
+  photo               Upload?            @relation(fields: [photoId], references: [id])
+  photoId             String?
   favourite           Boolean
   availableSlots      Int
   signedUsers         User[]
@@ -51,7 +52,6 @@ model Project {
   leader              Leader             @relation(fields: [leaderId], references: [id])
   leaderId            String
   sponsors            Sponsor[]
-  uploadId            String?
 }
 
 model Leader {
@@ -90,12 +90,13 @@ model DefinedPositions {
 }
 
 model Sponsor {
-  id          String    @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
   description String?
-  photo       Upload    @relation(fields: [uploadId], references: [id])
-  projects    Project[]
-  uploadId    String
+  photo       Upload  @relation(fields: [photoId], references: [id])
+  photoId     String
+  project     Project @relation(fields: [projectId], references: [id])
+  projectId   String
 }
 
 model Upload {

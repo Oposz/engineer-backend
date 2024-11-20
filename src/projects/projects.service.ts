@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddNewProjectDto } from './schemas/addProjectSchema';
 
@@ -81,41 +85,50 @@ export class ProjectsService {
     });
   }
 
-  addNewProject(body: AddNewProjectDto) {
-    console.log(body);
-    return this.prisma.$transaction(async (prisma) => {
-      const project = await this.prisma.project.create({
-        data: {
-          name: body.projectName,
-          description: body.description,
-          availableSlots: body.positions.reduce(
-            (sum, pos) => sum + pos.quantity,
-            0,
-          ),
-          dueTo: new Date(body.dueTo),
-          favourite: false,
-          //photo
-          leadingUniversityId: body.university,
-          leaderId: body.leader,
-          sponsors: {
-            connect: body.sponsors.map((sponsor) => ({
-              id: sponsor.photo,
+  async addNewProject(body: AddNewProjectDto) {
+    const uploadsIds = [
+      body.photo,
+      ...body.sponsors.map((sponsor) => sponsor.photo),
+    ];
+
+    const dbUploadedFiles = await this.prisma.upload.findMany({
+      where: {
+        id: { in: uploadsIds },
+      },
+    });
+
+    if (dbUploadedFiles.length !== uploadsIds.length) {
+      throw new BadRequestException('Invalid upload ids');
+    }
+
+    return this.prisma.project.create({
+      data: {
+        name: body.projectName,
+        description: body.description,
+        availableSlots: body.positions.reduce(
+          (sum, pos) => sum + pos.quantity,
+          0,
+        ),
+        definedPositions: {
+          createMany: {
+            data: body.positions.map((position) => ({ name: position.name })),
+          },
+        },
+        dueTo: new Date(body.dueTo),
+        favourite: false,
+        photoId: body.photo,
+        leadingUniversityId: body.university,
+        leaderId: body.leader,
+        sponsors: {
+          createMany: {
+            data: body.sponsors.map((sponsor) => ({
+              name: sponsor.name,
+              photoId: sponsor.photo,
+              description: sponsor.description,
             })),
           },
         },
-      });
-      const definedPositions = await Promise.all(
-        body.positions.map((position) =>
-          prisma.definedPositions.create({
-            data: {
-              name: position.name,
-              project: { connect: { id: project.id } },
-            },
-          }),
-        ),
-      );
-
-      return { project, definedPositions };
+      },
     });
   }
 }

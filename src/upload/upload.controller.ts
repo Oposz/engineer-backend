@@ -1,5 +1,8 @@
 import {
   Controller,
+  Get,
+  NotFoundException,
+  Param,
   Post,
   UploadedFile,
   UseGuards,
@@ -24,5 +27,21 @@ export class UploadController {
     });
 
     return { id: upload.id };
+  }
+
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  async getUpload(@Param('id') param: string) {
+    const file = await this.prisma.upload.findFirst({
+      where: {
+        id: param,
+      },
+    });
+
+    if (!file) {
+      throw new NotFoundException();
+    }
+
+    return { data: file.data };
   }
 }
