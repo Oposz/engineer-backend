@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { AddNewProjectDto } from './schemas/addProjectSchema';
 import { ApplyToProjectDto } from './schemas/applyToProjectSchema';
+import { AbandonProjectDto } from './schemas/abandonProjectSchema';
 
 @Injectable()
 export class ProjectsService {
@@ -161,6 +162,71 @@ export class ProjectsService {
           create: {
             userId: userId,
             definedPositionId: body.id,
+          },
+        },
+      },
+      include: {
+        signedUsers: {
+          select: {
+            id: true,
+            lastName: true,
+            name: true,
+          },
+        },
+        definedPositions: true,
+        takenPositions: true,
+        leader: {
+          select: {
+            name: true,
+            lastName: true,
+            title: true,
+          },
+        },
+        sponsors: true,
+      },
+    });
+  }
+
+  async disconnectUserFromProject(body: AbandonProjectDto, userId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: {
+        id: body.projectId,
+      },
+    });
+
+    const userToDisconnect = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+        projects: {
+          some: {
+            id: body.projectId,
+          },
+        },
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+
+    if (!userToDisconnect) {
+      throw new NotFoundException('User not found');
+    }
+
+    return this.prisma.project.update({
+      where: {
+        id: body.projectId,
+      },
+      data: {
+        signedUsers: {
+          disconnect: {
+            id: userId,
+          },
+        },
+        takenPositions: {
+          deleteMany: {
+            projectId: body.projectId,
+            userId: userId,
           },
         },
       },

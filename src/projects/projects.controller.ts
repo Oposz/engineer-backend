@@ -21,6 +21,10 @@ import {
   ApplyToProjectDto,
   applyToProjectSchema,
 } from './schemas/applyToProjectSchema';
+import {
+  AbandonProjectDto,
+  abandonProjectSchema,
+} from './schemas/abandonProjectSchema';
 
 @Controller('projects')
 export class ProjectsController {
@@ -58,5 +62,14 @@ export class ProjectsController {
     @User() user: UserFromReq,
   ) {
     return this.projectsService.connectUserToProject(body, user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('/abandon')
+  disconnectUserFromProject(
+    @Body(new ZodValidationPipe(abandonProjectSchema)) body: AbandonProjectDto,
+    @User() user: UserFromReq,
+  ) {
+    return this.projectsService.disconnectUserFromProject(body, user.sub);
   }
 }
