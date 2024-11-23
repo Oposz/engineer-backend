@@ -134,4 +134,15 @@ export class UsersService {
       };
     });
   }
+
+  getAllUsers() {
+    return this.prisma.user.findMany({
+      select: {
+        name: true,
+        lastName: true,
+        id: true,
+        email: true,
+      },
+    });
+  }
 }
