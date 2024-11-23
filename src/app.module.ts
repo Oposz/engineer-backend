@@ -9,6 +9,7 @@ import { UniversitiesModule } from './universities/universities.module';
 import { ProjectsModule } from './projects/projects.module';
 import { LeadersModule } from './leaders/leaders.module';
 import { UploadModule } from './upload/upload.module';
+import { ChatsModule } from './chats/chats.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UploadModule } from './upload/upload.module';
     ProjectsModule,
     LeadersModule,
     UploadModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -65,11 +65,11 @@ model Leader {
   email        String     @unique
   role         String
   department   String
-  photo        Upload?    @relation(fields: [uploadId], references: [id])
+  photo        Upload?    @relation(fields: [photoId], references: [id])
+  photoId      String?
   university   University @relation(fields: [universityId], references: [id])
   universityId String
   projects     Project[]
-  uploadId     String?
 }
 
 model Position {
@@ -109,14 +109,18 @@ model Upload {
   Project    Project[]
   Leader     Leader[]
   Sponsor    Sponsor[]
+  Chat       Chat[]
 }
 
 model Chat {
   id        String    @id @default(cuid())
+  name      String?
   users     User[]
   messages  Message[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  photo     Upload?   @relation(fields: [photoId], references: [id])
+  photoId   String?
 }
 
 model Message {
