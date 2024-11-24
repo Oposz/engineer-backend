@@ -130,6 +130,7 @@ model Message {
   chatId    String
   user      User     @relation(fields: [userId], references: [id])
   userId    String
+  new       Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

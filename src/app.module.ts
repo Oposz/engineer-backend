@@ -10,6 +10,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { LeadersModule } from './leaders/leaders.module';
 import { UploadModule } from './upload/upload.module';
 import { ChatsModule } from './chats/chats.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ChatsModule } from './chats/chats.module';
     LeadersModule,
     UploadModule,
     ChatsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
