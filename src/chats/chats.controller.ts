@@ -17,6 +17,15 @@ export class ChatsController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('new-messages/:id')
+  getChatsWithUnseenMsg(
+    @User() user: UserFromReq,
+    @Param('id') chatId: string,
+  ) {
+    return this.chatsService.getChatsWithUnseenMsg(user.sub, chatId);
+  }
+
+  @UseGuards(AuthGuard)
   @Get(':id')
   getChatById(@Param('id') chatId: string) {
     return this.chatsService.getChatById(chatId);

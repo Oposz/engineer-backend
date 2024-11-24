@@ -80,4 +80,37 @@ export class ChatsService {
       },
     });
   }
+
+  getChatsWithUnseenMsg(userId: string, chatId: string) {
+    return this.prisma.chat.findUnique({
+      where: {
+        users: {
+          some: {
+            id: userId,
+          },
+        },
+        messages: {
+          some: {
+            new: true,
+          },
+        },
+        id: chatId,
+      },
+      select: {
+        id: true,
+        messages: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+          select: {
+            content: true,
+            userId: true,
+            new: true,
+            chatId: true,
+          },
+        },
+      },
+    });
+  }
 }
