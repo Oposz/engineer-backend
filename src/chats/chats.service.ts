@@ -164,4 +164,30 @@ export class ChatsService {
       },
     });
   }
+
+  async changeChatName(chatId: string, userId: string, chatNewName: string) {
+    const chat = await this.prisma.chat.findUnique({
+      where: {
+        id: chatId,
+        users: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    await this.prisma.chat.update({
+      where: {
+        id: chatId,
+      },
+      data: {
+        name: chatNewName,
+      },
+    });
+  }
 }
