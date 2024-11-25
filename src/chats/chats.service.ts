@@ -20,9 +20,22 @@ export class ChatsService {
       include: {
         messages: true,
         users: true,
+        views: true,
       },
     });
-    return chats.map((chat) => {
+
+    const sortedChats = _.orderBy(
+      chats,
+      [
+        (chat) => {
+          const latestMessage = _.maxBy(chat.messages, 'createdAt');
+          return latestMessage ? latestMessage.createdAt : new Date(0);
+        },
+      ],
+      ['desc'],
+    );
+
+    return sortedChats.map((chat) => {
       return {
         ...chat,
         users: chat.users.map((user) => _.omit(user, ['password'])),
@@ -81,7 +94,7 @@ export class ChatsService {
     });
   }
 
-  getChatsWithUnseenMsg(userId: string, chatId: string) {
+  getChatWithUnseenMsg(userId: string, chatId: string) {
     return this.prisma.chat.findUnique({
       where: {
         users: {
@@ -108,8 +121,46 @@ export class ChatsService {
             userId: true,
             new: true,
             chatId: true,
+            id: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
+      },
+    });
+  }
+
+  async markChatAsSeen(chatId: string, userId: string) {
+    const chat = await this.prisma.chat.findFirst({
+      where: {
+        id: chatId,
+        users: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    if (!chat) {
+      throw new NotFoundException('Chat not found or user is not a member');
+    }
+
+    await this.prisma.chatView.upsert({
+      where: {
+        chatAndUserId: {
+          chatId: chatId,
+          userId: userId,
+        },
+      },
+      update: {
+        lastSeen: new Date(),
+        updatedAt: new Date(),
+      },
+      create: {
+        chatId: chatId,
+        userId: userId,
+        lastSeen: new Date(),
       },
     });
   }

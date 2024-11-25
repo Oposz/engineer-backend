@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { User } from '../decorators/user.decorator';
 import { UserFromReq } from '../users/users.controller';
@@ -18,11 +26,8 @@ export class ChatsController {
 
   @UseGuards(AuthGuard)
   @Get('new-messages/:id')
-  getChatsWithUnseenMsg(
-    @User() user: UserFromReq,
-    @Param('id') chatId: string,
-  ) {
-    return this.chatsService.getChatsWithUnseenMsg(user.sub, chatId);
+  getChatWithUnseenMsg(@User() user: UserFromReq, @Param('id') chatId: string) {
+    return this.chatsService.getChatWithUnseenMsg(user.sub, chatId);
   }
 
   @UseGuards(AuthGuard)
@@ -38,5 +43,11 @@ export class ChatsController {
     @User() user: UserFromReq,
   ) {
     return this.chatsService.createNewChat(body, user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('seen/:id')
+  markAllMsgAsSeen(@Param('id') chatId: string, @User() user: UserFromReq) {
+    return this.chatsService.markChatAsSeen(chatId, user.sub);
   }
 }

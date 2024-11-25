@@ -24,6 +24,7 @@ model User {
   position     Position[]
   chats        Chat[]
   messages     Message[]
+  chatViews    ChatView[]
 }
 
 model University {
@@ -113,14 +114,27 @@ model Upload {
 }
 
 model Chat {
-  id        String    @id @default(cuid())
+  id        String     @id @default(cuid())
   name      String?
   users     User[]
   messages  Message[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  photo     Upload?   @relation(fields: [photoId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  photo     Upload?    @relation(fields: [photoId], references: [id])
   photoId   String?
+  views     ChatView[]
+}
+
+model ChatView {
+  id        String   @id @default(cuid())
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  chatId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  lastSeen  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique(name: "chatAndUserId", [chatId, userId])
 }
 
 model Message {
