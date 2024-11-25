@@ -190,4 +190,47 @@ export class ChatsService {
       },
     });
   }
+
+  async disconnectChat(chatId: string, userId: string) {
+    const chat = await this.prisma.chat.findUnique({
+      where: {
+        id: chatId,
+        users: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+    if (!chat) {
+      throw new NotFoundException('Chat not found or user is missing');
+    }
+    const updatedChat = await this.prisma.chat.update({
+      where: {
+        id: chatId,
+        users: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+      data: {
+        users: {
+          disconnect: {
+            id: userId,
+          },
+        },
+      },
+      include: {
+        users: true,
+      },
+    });
+
+    if (updatedChat.users.length >= 2) return;
+    await this.prisma.chat.delete({
+      where: {
+        id: chatId,
+      },
+    });
+  }
 }

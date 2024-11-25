@@ -61,4 +61,10 @@ export class ChatsController {
   ) {
     return this.chatsService.changeChatName(chatId, user.sub, body.name);
   }
+
+  @UseGuards(AuthGuard)
+  @Patch('disconnect/:id')
+  disconnectChat(@Param('id') chatId: string, @User() user: UserFromReq) {
+    return this.chatsService.disconnectChat(chatId, user.sub);
+  }
 }
