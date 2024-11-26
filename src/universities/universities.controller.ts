@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { UniversitiesService } from './universities.service';
 import { AuthGuard } from '../auth/auth.guard';
 
@@ -15,5 +15,11 @@ export class UniversitiesController {
   @Get(':id')
   getUniversity(@Param() param: { id: string }) {
     return this.universitiesService.getUniversity(param.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('favourite/:id')
+  toggleUniversityFav(@Param('id') param: string) {
+    return this.universitiesService.toggleUniversityFav(param);
   }
 }

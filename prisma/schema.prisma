@@ -19,6 +19,7 @@ model User {
   name         String
   lastName     String
   password     String
+  role         Role
   universities University[]
   projects     Project[]
   position     Position[]
@@ -31,11 +32,12 @@ model University {
   id          String    @id @default(cuid())
   name        String
   description String
-  photo       Upload?   @relation(fields: [uploadId], references: [id])
+  photo       Upload?   @relation(fields: [photoId], references: [id])
+  photoId     String?
+  favourite   Boolean
   users       User[]
   projects    Project[]
   leaders     Leader[]
-  uploadId    String?
 }
 
 model Project {
@@ -71,6 +73,7 @@ model Leader {
   university   University @relation(fields: [universityId], references: [id])
   universityId String
   projects     Project[]
+  favourite    Boolean
 }
 
 model Position {
@@ -147,4 +150,9 @@ model Message {
   new       Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
 }

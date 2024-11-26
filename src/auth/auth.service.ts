@@ -23,7 +23,6 @@ export class AuthService {
 
     return {
       access_token: await this.jwtService.signAsync(CreateJwtPayload(user)),
-      userId: user.id,
     };
   }
 
@@ -34,7 +33,6 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(
         CreateJwtPayload(createdUser),
       ),
-      userId: createdUser.id,
     };
   }
 

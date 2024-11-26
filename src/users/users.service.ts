@@ -39,6 +39,7 @@ export class UsersService {
           connect: { id: userData.university },
         },
         lastName: userData.lastName,
+        role: 'USER',
       },
     });
   }

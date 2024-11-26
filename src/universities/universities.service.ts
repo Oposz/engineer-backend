@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -28,6 +28,27 @@ export class UniversitiesService {
             },
           },
         },
+      },
+    });
+  }
+
+  async toggleUniversityFav(universityId: string) {
+    const university = await this.prisma.university.findUnique({
+      where: {
+        id: universityId,
+      },
+    });
+
+    if (!university) {
+      throw new NotFoundException('University not found');
+    }
+
+    return this.prisma.university.update({
+      where: {
+        id: universityId,
+      },
+      data: {
+        favourite: !university.favourite,
       },
     });
   }

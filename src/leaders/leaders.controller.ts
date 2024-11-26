@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { LeadersService } from './leaders.service';
 
@@ -10,5 +10,11 @@ export class LeadersController {
   @Get()
   getAllLeaders() {
     return this.leadersService.getAllLeaders();
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('favourite/:id')
+  toggleUniversityFav(@Param('id') param: string) {
+    return this.leadersService.toggleLeaderFav(param);
   }
 }
