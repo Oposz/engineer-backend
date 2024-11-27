@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -25,6 +26,10 @@ import {
   AbandonProjectDto,
   abandonProjectSchema,
 } from './schemas/abandonProjectSchema';
+import {
+  DeleteManyProjectsDto,
+  deleteManyProjectsSchema,
+} from './schemas/deleteManyProjectsSchema';
 
 @Controller('projects')
 export class ProjectsController {
@@ -32,8 +37,14 @@ export class ProjectsController {
 
   @UseGuards(AuthGuard)
   @Get('all')
-  getProjects(@User() user: UserFromReq) {
-    return this.projectsService.getAllProjects(user.sub);
+  getProjects() {
+    return this.projectsService.getAllProjects();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('available')
+  getAvailableProjects(@User() user: UserFromReq) {
+    return this.projectsService.getAllProjectsExcludingMine(user.sub);
   }
 
   @UseGuards(AuthGuard)
@@ -56,7 +67,7 @@ export class ProjectsController {
   }
 
   @UseGuards(AuthGuard)
-  @Patch('/apply')
+  @Patch('apply')
   connectUserToProject(
     @Body(new ZodValidationPipe(applyToProjectSchema)) body: ApplyToProjectDto,
     @User() user: UserFromReq,
@@ -65,11 +76,26 @@ export class ProjectsController {
   }
 
   @UseGuards(AuthGuard)
-  @Patch('/abandon')
+  @Patch('abandon')
   disconnectUserFromProject(
     @Body(new ZodValidationPipe(abandonProjectSchema)) body: AbandonProjectDto,
     @User() user: UserFromReq,
   ) {
     return this.projectsService.disconnectUserFromProject(body, user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('delete/:id')
+  deleteProject(@Param('id') param: string) {
+    return this.projectsService.deleteProject(param);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('delete-all')
+  deleteManyProject(
+    @Body(new ZodValidationPipe(deleteManyProjectsSchema))
+    body: DeleteManyProjectsDto,
+  ) {
+    return this.projectsService.deleteManyProjects(body);
   }
 }

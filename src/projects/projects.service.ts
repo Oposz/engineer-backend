@@ -7,12 +7,33 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AddNewProjectDto } from './schemas/addProjectSchema';
 import { ApplyToProjectDto } from './schemas/applyToProjectSchema';
 import { AbandonProjectDto } from './schemas/abandonProjectSchema';
+import { DeleteManyProjectsDto } from './schemas/deleteManyProjectsSchema';
 
 @Injectable()
 export class ProjectsService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllProjects(userId: string) {
+  async getAllProjects() {
+    const _ = require('lodash');
+    const projects = await this.prisma.project.findMany({
+      include: {
+        signedUsers: true,
+        leadingUniversity: true,
+        leader: true,
+      },
+    });
+
+    return projects.map((project) => {
+      return {
+        ...project,
+        signedUsers: project.signedUsers.map((user) =>
+          _.omit(user, ['password']),
+        ),
+      };
+    });
+  }
+
+  async getAllProjectsExcludingMine(userId: string) {
     const _ = require('lodash');
     const projects = await this.prisma.project.findMany({
       where: {
@@ -248,6 +269,46 @@ export class ProjectsService {
           },
         },
         sponsors: true,
+      },
+    });
+  }
+
+  async deleteProject(projectId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+    });
+    if (!project) {
+      throw new NotFoundException('Project to delete not found');
+    }
+    return this.prisma.project.delete({
+      where: {
+        id: projectId,
+      },
+    });
+  }
+
+  async deleteManyProjects(requestBody: DeleteManyProjectsDto) {
+    const projectsToDelete = await this.prisma.project.findMany({
+      where: {
+        id: {
+          in: requestBody.projectIds,
+        },
+      },
+    });
+
+    console.log(projectsToDelete);
+
+    if (projectsToDelete.length !== requestBody.projectIds.length) {
+      throw new NotFoundException('Some projects to delete not found');
+    }
+
+    return this.prisma.project.deleteMany({
+      where: {
+        id: {
+          in: requestBody.projectIds,
+        },
       },
     });
   }
