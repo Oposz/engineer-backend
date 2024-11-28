@@ -8,6 +8,7 @@ import { AddNewProjectDto } from './schemas/addProjectSchema';
 import { ApplyToProjectDto } from './schemas/applyToProjectSchema';
 import { AbandonProjectDto } from './schemas/abandonProjectSchema';
 import { DeleteManyProjectsDto } from './schemas/deleteManyProjectsSchema';
+import { UpdateProjectDto } from './schemas/updateProjectSchema';
 
 @Injectable()
 export class ProjectsService {
@@ -77,6 +78,7 @@ export class ProjectsService {
         takenPositions: true,
         leader: {
           select: {
+            id: true,
             name: true,
             lastName: true,
             title: true,
@@ -123,7 +125,6 @@ export class ProjectsService {
     if (dbUploadedFiles.length !== uploadsIds.length) {
       throw new BadRequestException('Invalid upload ids');
     }
-
     return this.prisma.project.create({
       data: {
         name: body.projectName,
@@ -140,7 +141,7 @@ export class ProjectsService {
             })),
           },
         },
-        dueTo: new Date(body.dueTo),
+        dueTo: body.dueTo,
         favourite: false,
         photoId: body.photo,
         leadingUniversityId: body.university,
@@ -298,8 +299,6 @@ export class ProjectsService {
       },
     });
 
-    console.log(projectsToDelete);
-
     if (projectsToDelete.length !== requestBody.projectIds.length) {
       throw new NotFoundException('Some projects to delete not found');
     }
@@ -310,6 +309,94 @@ export class ProjectsService {
           in: requestBody.projectIds,
         },
       },
+    });
+  }
+
+  async editProject(body: UpdateProjectDto, projectId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    const positionToAdd = body.positions.filter((position) => !position.id);
+    const positionsToDeleteIds = body.positionsToDelete.map(
+      (position) => position.id,
+    );
+
+    const sponsorsToDeleteIds = body.deletedSponsors.map((sponsor) => {
+      if (!sponsor) return '';
+      return sponsor.id;
+    });
+
+    const updateData: any = {
+      name: body.projectName,
+      description: body.description,
+      availableSlots: body.positions.reduce(
+        (sum, pos) => sum + pos.quantity,
+        0,
+      ),
+      dueTo: body.dueTo,
+      photoId: body.photo || project.photoId,
+      leadingUniversityId: body.university,
+      leaderId: body.leader,
+    };
+
+    if (positionToAdd.length > 0) {
+      updateData.definedPositions = {
+        createMany: {
+          data: positionToAdd.map((position) => ({
+            name: position.name,
+            quantity: position.quantity,
+          })),
+        },
+      };
+    }
+
+    if (positionsToDeleteIds.length > 0) {
+      updateData.definedPositions = {
+        ...updateData.definedPositions,
+        deleteMany: {
+          id: {
+            in: positionsToDeleteIds,
+          },
+        },
+      };
+    }
+
+    if (body.sponsors.length > 0) {
+      const sponsorsToCreate = body.sponsors.filter((sponsor) => !sponsor!.id);
+
+      if (sponsorsToCreate.length > 0) {
+        updateData.sponsors = {
+          createMany: {
+            data: sponsorsToCreate.map((sponsor) => ({
+              name: sponsor!.name,
+              photoId: sponsor!.photo,
+              description: sponsor!.description,
+            })),
+          },
+        };
+      }
+    }
+
+    if (sponsorsToDeleteIds.length > 0) {
+      updateData.sponsors = {
+        ...updateData.sponsors,
+        deleteMany: {
+          id: {
+            in: sponsorsToDeleteIds,
+          },
+        },
+      };
+    }
+
+    return this.prisma.project.update({
+      where: { id: projectId },
+      data: updateData,
     });
   }
 }

@@ -30,6 +30,10 @@ import {
   DeleteManyProjectsDto,
   deleteManyProjectsSchema,
 } from './schemas/deleteManyProjectsSchema';
+import {
+  UpdateProjectDto,
+  updateProjectSchema,
+} from './schemas/updateProjectSchema';
 
 @Controller('projects')
 export class ProjectsController {
@@ -64,6 +68,15 @@ export class ProjectsController {
   @UsePipes(new ZodValidationPipe(addNewProjectSchema))
   addNewProject(@Body() body: AddNewProjectDto) {
     return this.projectsService.addNewProject(body);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('edit/:id')
+  editProject(
+    @Body(new ZodValidationPipe(updateProjectSchema)) body: UpdateProjectDto,
+    @Param('id') param: string,
+  ) {
+    return this.projectsService.editProject(body, param);
   }
 
   @UseGuards(AuthGuard)
