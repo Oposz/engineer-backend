@@ -104,7 +104,7 @@ export class ProjectsController {
   }
 
   @UseGuards(AuthGuard)
-  @Patch('delete-all')
+  @Patch('delete-many')
   deleteManyProject(
     @Body(new ZodValidationPipe(deleteManyProjectsSchema))
     body: DeleteManyProjectsDto,
