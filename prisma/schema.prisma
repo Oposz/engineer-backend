@@ -30,7 +30,7 @@ model User {
 
 model University {
   id          String    @id @default(cuid())
-  name        String
+  name        String    @unique
   description String
   photo       Upload?   @relation(fields: [photoId], references: [id])
   photoId     String?
@@ -66,7 +66,6 @@ model Leader {
   title        String
   phoneNumber  String
   email        String     @unique
-  role         String
   department   String
   photo        Upload?    @relation(fields: [photoId], references: [id])
   photoId      String?
