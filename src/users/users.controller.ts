@@ -4,6 +4,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   UseGuards,
   UsePipes,
@@ -51,6 +53,18 @@ export class UsersController {
   @Get('teams')
   getTeams(@User() user: UserFromReq) {
     return this.usersService.getUserTeams(user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('favourites')
+  getFavourites(@User() user: UserFromReq) {
+    return this.usersService.getUserFavs(user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('favourite/:id')
+  toggleUniversityFav(@Param('id') param: string, @User() user: UserFromReq) {
+    return this.usersService.toggleFav(param, user.sub);
   }
 
   @HttpCode(HttpStatus.OK)

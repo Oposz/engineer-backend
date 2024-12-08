@@ -26,6 +26,7 @@ model User {
   chats        Chat[]
   messages     Message[]
   chatViews    ChatView[]
+  favourites   String[]
 }
 
 model University {
@@ -34,7 +35,6 @@ model University {
   description String
   photo       Upload?   @relation(fields: [photoId], references: [id])
   photoId     String?
-  favourite   Boolean   @default(false)
   users       User[]
   projects    Project[]
   leaders     Leader[]
@@ -46,7 +46,6 @@ model Project {
   description         String?
   photo               Upload?            @relation(fields: [photoId], references: [id])
   photoId             String?
-  favourite           Boolean
   availableSlots      Int
   signedUsers         User[]
   dueTo               DateTime?
@@ -72,7 +71,6 @@ model Leader {
   university   University @relation(fields: [universityId], references: [id])
   universityId String
   projects     Project[]
-  favourite    Boolean
 }
 
 model Position {

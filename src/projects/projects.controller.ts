@@ -58,12 +58,6 @@ export class ProjectsController {
   }
 
   @UseGuards(AuthGuard)
-  @Patch('favourite/:id')
-  toggleIsProjectFavourite(@Param('id') param: string) {
-    return this.projectsService.toggleIsProjectFavourite(param);
-  }
-
-  @UseGuards(AuthGuard)
   @Post('add')
   @UsePipes(new ZodValidationPipe(addNewProjectSchema))
   addNewProject(@Body() body: AddNewProjectDto) {

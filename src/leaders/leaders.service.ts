@@ -30,27 +30,6 @@ export class LeadersService {
     });
   }
 
-  async toggleLeaderFav(leaderId: string) {
-    const leader = await this.prisma.leader.findUnique({
-      where: {
-        id: leaderId,
-      },
-    });
-
-    if (!leader) {
-      throw new NotFoundException('Leader not found');
-    }
-
-    return this.prisma.leader.update({
-      where: {
-        id: leaderId,
-      },
-      data: {
-        favourite: !leader.favourite,
-      },
-    });
-  }
-
   async deleteLeader(leaderId: string) {
     const leader = await this.prisma.leader.findUnique({
       where: {
@@ -180,7 +159,6 @@ export class LeadersService {
         name: body.name,
         phoneNumber: body.phone,
         title: body.title,
-        favourite: false,
         photoId: body.photoId ?? leader.photoId,
       },
       include: {

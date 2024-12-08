@@ -49,27 +49,6 @@ export class UniversitiesService {
     });
   }
 
-  async toggleUniversityFav(universityId: string) {
-    const university = await this.prisma.university.findUnique({
-      where: {
-        id: universityId,
-      },
-    });
-
-    if (!university) {
-      throw new NotFoundException('University not found');
-    }
-
-    return this.prisma.university.update({
-      where: {
-        id: universityId,
-      },
-      data: {
-        favourite: !university.favourite,
-      },
-    });
-  }
-
   async deleteUniversity(universityId: string) {
     const uni = await this.prisma.university.findUnique({
       where: {
@@ -153,7 +132,6 @@ export class UniversitiesService {
         name: body.name,
         photoId: body.photoId,
         description: body.description ?? '',
-        favourite: false,
       },
       include: {
         projects: true,

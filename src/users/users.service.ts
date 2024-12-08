@@ -59,6 +59,41 @@ export class UsersService {
     });
   }
 
+  getUserFavs(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { favourites: true },
+    });
+  }
+
+  async toggleFav(favId: string, userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { favourites: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const currentFavourites = user.favourites || [];
+    const isFavorite = currentFavourites.includes(favId);
+
+    const updatedFavourites = isFavorite
+      ? currentFavourites.filter((id) => id !== favId)
+      : [...currentFavourites, favId];
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        favourites: updatedFavourites,
+      },
+      select: {
+        favourites: true,
+      },
+    });
+  }
+
   async connectUniversity(universityId: string, userId: string) {
     const universityToConnect = await this.prisma.university.findUnique({
       where: { id: universityId },

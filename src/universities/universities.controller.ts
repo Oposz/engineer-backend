@@ -57,12 +57,6 @@ export class UniversitiesController {
   }
 
   @UseGuards(AuthGuard)
-  @Patch('favourite/:id')
-  toggleUniversityFav(@Param('id') param: string) {
-    return this.universitiesService.toggleUniversityFav(param);
-  }
-
-  @UseGuards(AuthGuard)
   @Patch('edit/:id')
   editUniversity(
     @Body(new ZodValidationPipe(editUniversitySchema)) body: EditUniversityDto,

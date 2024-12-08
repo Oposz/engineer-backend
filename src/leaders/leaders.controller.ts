@@ -54,12 +54,6 @@ export class LeadersController {
   }
 
   @UseGuards(AuthGuard)
-  @Patch('favourite/:id')
-  toggleLeaderFav(@Param('id') param: string) {
-    return this.leadersService.toggleLeaderFav(param);
-  }
-
-  @UseGuards(AuthGuard)
   @Delete('delete/:id')
   deleteLeader(@Param('id') param: string) {
     return this.leadersService.deleteLeader(param);

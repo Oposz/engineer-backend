@@ -89,27 +89,6 @@ export class ProjectsService {
     });
   }
 
-  async toggleIsProjectFavourite(projectId: string) {
-    const project = await this.prisma.project.findUnique({
-      where: {
-        id: projectId,
-      },
-    });
-
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
-
-    return this.prisma.project.update({
-      where: {
-        id: projectId,
-      },
-      data: {
-        favourite: !project.favourite,
-      },
-    });
-  }
-
   async addNewProject(body: AddNewProjectDto) {
     const uploadsIds = [
       body.photo,
@@ -142,7 +121,6 @@ export class ProjectsService {
           },
         },
         dueTo: body.dueTo,
-        favourite: false,
         photoId: body.photo,
         leadingUniversityId: body.university,
         leaderId: body.leader,
