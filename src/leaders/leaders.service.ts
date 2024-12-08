@@ -106,7 +106,6 @@ export class LeadersService {
       name: body.name,
       phoneNumber: body.phone,
       title: body.title,
-      favourite: false,
     };
 
     if (body.photoId) {
