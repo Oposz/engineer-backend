@@ -35,9 +35,7 @@ export class MessagesGateway
   handleAuthentication(client: AuthenticatedSocket, userId: string) {
     try {
       client.userId = userId;
-
       this.userIdToSocketId.set(userId, client);
-
       this.logger.log(`User ${userId} authenticated with socket ${client.id}`);
 
       return { status: 'authenticated', userId };
@@ -58,7 +56,10 @@ export class MessagesGateway
     }
   }
 
-  notifyAboutNewMessagesInChat(usersToNotify: string[], updateChatId: string) {
+  notifyAboutNewMessageOnConversationView(
+    usersToNotify: string[],
+    updateChatId: string,
+  ) {
     for (const user of usersToNotify) {
       const socket = this.userIdToSocketId.get(user);
       socket?.emit('newMessageInChat', updateChatId);

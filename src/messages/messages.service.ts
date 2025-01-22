@@ -40,7 +40,7 @@ export class MessagesService {
     });
     const usersToNotify = message.chat.users.map((user) => user.id);
     this.messagesGateway.notifyAboutNewMessage(usersToNotify);
-    this.messagesGateway.notifyAboutNewMessagesInChat(
+    this.messagesGateway.notifyAboutNewMessageOnConversationView(
       usersToNotify,
       message.chatId,
     );

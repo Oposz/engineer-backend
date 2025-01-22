@@ -1,14 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from '../auth/schemas/registerDto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  findOneByCredentials(email: string, password: string) {
-    return this.prisma.user.findFirst({
-      where: { email, password },
+  SALT = 10;
+
+  findOneByCredentials(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
     });
   }
 
@@ -30,10 +37,20 @@ export class UsersService {
   }
 
   async createOne(userData: RegisterDto) {
+    const user = await this.findOneByCredentials(userData.email);
+    if (user) {
+      throw new ConflictException('User with this email already exists');
+    }
+
+    const hashedPassword: string = await bcrypt.hash(
+      userData.password,
+      this.SALT,
+    );
+
     return this.prisma.user.create({
       data: {
         email: userData.email,
-        password: userData.password,
+        password: hashedPassword,
         name: userData.name,
         universities: {
           connect: { id: userData.university },

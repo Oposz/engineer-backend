@@ -6,6 +6,7 @@ import { CreateJwtPayload } from '../utils/createJwtPayload';
 import { ChangeEmailDto } from './schemas/changeEmailSchema';
 import { PrismaService } from '../prisma/prisma.service';
 import { ChangePasswordDto } from './schemas/changePasswordSchema';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -16,13 +17,15 @@ export class AuthService {
   ) {}
 
   async signIn(email: string, _password: string) {
-    const user = await this.usersService.findOneByCredentials(email, _password);
-    if (user?.password !== _password) {
+    const user = await this.usersService.findOneByCredentials(email);
+    const isMatch = await bcrypt.compare(_password, user?.password);
+
+    if (!isMatch) {
       throw new UnauthorizedException();
     }
 
     return {
-      access_token: await this.jwtService.signAsync(CreateJwtPayload(user)),
+      access_token: await this.jwtService.signAsync(CreateJwtPayload(user!)),
     };
   }
 
